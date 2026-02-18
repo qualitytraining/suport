@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quality Training Pro - Elite</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --verde: #2ecc71; --violeta: #8e44ad; --bg: #000000; --card: #151515; --ath: #ff6b00; --paypal: #0070ba; }
+        
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background: var(--bg); color: white; margin: 0; padding: 0;
+            overflow-x: hidden; width: 100%;
+        }
+
+        .header {
+            background: #111; padding: 15px; display: flex; align-items: center;
+            border-bottom: 2px solid #222; position: sticky; top: 0; z-index: 999;
+        }
+
+        .menu-trigger {
+            background: transparent; color: var(--verde); border: 1px solid var(--verde);
+            padding: 8px 12px; border-radius: 8px; font-size: 20px; margin-right: 15px;
+        }
+
+        .side-menu {
+            position: fixed; top: 0; left: -100%; width: 85%; height: 100%;
+            background: #111; z-index: 10000; transition: 0.4s ease;
+            padding-top: 50px; box-shadow: 10px 0 20px rgba(0,0,0,0.8);
+        }
+        .side-menu.open { left: 0; }
+        .menu-item { display: block; padding: 20px 30px; color: white; text-decoration: none; font-size: 1.1em; border-bottom: 1px solid #222; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; }
+
+        .content { padding: 15px; box-sizing: border-box; }
+        .view { display: none; width: 100%; }
+        .view.active { display: block; }
+
+        .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; }
+        
+        /* ACORDEONES */
+        .accordion {
+            background: #222; color: var(--verde); cursor: pointer; padding: 15px;
+            width: 100%; border: none; text-align: left; outline: none;
+            font-size: 14px; font-weight: bold; border-radius: 10px;
+            margin-bottom: 5px; text-transform: uppercase; display: flex; justify-content: space-between;
+        }
+        .panel { padding: 0 10px; display: none; background-color: transparent; overflow: hidden; margin-bottom: 15px; }
+
+        label { display: block; font-size: 0.7em; color: #888; margin-bottom: 5px; margin-left: 5px; text-transform: uppercase; margin-top: 10px; }
+        input, textarea, select { 
+            width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #444; 
+            color: white; border-radius: 10px; margin-bottom: 10px; font-size: 15px; 
+            box-sizing: border-box;
+        }
+
+        .btn-save-big {
+            width: 100%; padding: 20px; background: var(--violeta); color: white;
+            border: none; border-radius: 15px; font-weight: bold; font-size: 16px;
+            margin-top: 20px; box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
+        }
+
+        .btn-save-big:active { transform: scale(0.98); background: #732d91; }
+
+        .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-pay {
+            padding: 15px 10px; border-radius: 12px; border: none;
+            font-weight: bold; font-size: 12px; display: flex;
+            align-items: center; justify-content: center; gap: 8px; color: white;
+        }
+        .btn-ath { background: var(--ath); }
+        .btn-paypal { background: var(--paypal); }
+        .logo-small { height: 16px; background: white; padding: 2px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button class="menu-trigger" onclick="openMenu()">☰</button>
+        <span style="font-weight: bold; color: var(--verde);">QUALITY TRAINING ELITE</span>
+    </div>
+
+    <div id="sideMenu" class="side-menu">
+        <div style="padding: 20px; font-weight: bold; color: var(--verde); border-bottom: 1px solid #333;">CONTROL PANEL</div>
+        <a href="#" class="menu-item" onclick="changePage('cliente')">👤 Expediente Maestro</a>
+        <a href="#" class="menu-item" onclick="changePage('entreno')">🏠 Inicio / Pagos</a>
+        <a href="#" class="menu-item" onclick="changePage('ajustes')">⚙️ Ajustes de Dueño</a>
+        <a href="#" class="menu-item" onclick="closeMenu()" style="color: #ff4444; margin-top: 20px;">✖ Cerrar</a>
+    </div>
+
+    <div id="overlay" class="overlay" onclick="closeMenu()"></div>
+
+    <div class="content">
+        
+        <div id="view-cliente" class="view">
+            <h2 style="color: var(--violeta); margin-bottom: 20px;">Expediente del Paciente</h2>
+            
+            <button class="accordion" onclick="toggleAcc(this)">Personal & Contacto <span>+</span></button>
+            <div class="panel">
+                <label>Nombre Completo</label>
+                <input type="text" id="in_name">
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1"><label>Edad</label><input type="number" id="in_edad"></div>
+                    <div style="flex:1"><label>Teléfono</label><input type="tel" id="in_tel"></div>
+                </div>
+                <label>Contacto Emergencia</label>
+                <input type="text" id="in_emer">
+            </div>
+
+            <button class="accordion" onclick="toggleAcc(this)">Biometría & Composición <span>+</span></button>
+            <div class="panel">
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1"><label>Peso Ini. (lbs)</label><input type="text" id="in_peso_i"></div>
+                    <div style="flex:1"><label>Estatura</label><input type="text" id="in_est"></div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1"><label>% Grasa</label><input type="text" id="in_grasa"></div>
+                    <div style="flex:1"><label>Cintura (cm)</label><input type="text" id="in_cint"></div>
+                </div>
+            </div>
+
+            <button class="accordion" onclick="toggleAcc(this)">Salud e Historial Médico <span>+</span></button>
+            <div class="panel">
+                <label>¿Padece condición médica?</label>
+                <select id="in_padece"><option value="No">No</option><option value="Si">Sí</option></select>
+                <label>Descripción de Condición / Medicamentos</label>
+                <textarea id="in_cond_det" rows="4"></textarea>
+                <label>Cirugías / Lesiones</label>
+                <textarea id="in_les" rows="3"></textarea>
+            </div>
+
+            <button class="accordion" onclick="toggleAcc(this)">Estilo de Vida & Nutrición <span>+</span></button>
+            <div class="panel">
+                <label>Actividad</label>
+                <select id="in_act">
+                    <option value="Sedentario">Sedentario</option>
+                    <option value="Moderado">Moderado</option>
+                    <option value="Intenso">Intenso</option>
+                </select>
+                <label>Horas de Sueño</label>
+                <select id="in_sue">
+                    <option value="<6h">< 6h</option>
+                    <option value="6-8h">6-8h</option>
+                    <option value=">8h">> 8h</option>
+                </select>
+                <label>Alergias Alimentarias</label>
+                <input type="text" id="in_ale">
+                <label>Suplementación</label>
+                <input type="text" id="in_sup">
+            </div>
+
+            <button class="accordion" onclick="toggleAcc(this)">Evaluación de Fuerza <span>+</span></button>
+            <div class="panel">
+                <label>Objetivo</label>
+                <input type="text" id="in_obj">
+                <label>Récords (B/S/D)</label>
+                <input type="text" id="in_rm">
+            </div>
+
+            <button class="btn-save-big" onclick="saveExpedienteCompleto()">💾 GUARDAR EXPEDIENTE COMPLETO</button>
+            <p id="msgSave" style="text-align:center; color: var(--verde); display:none; margin-top:10px;">¡Expediente actualizado con éxito!</p>
+        </div>
+
+        <div id="view-entreno" class="view active">
+            <div class="card">
+                <h2 id="displayNombre" style="margin:0;">--</h2>
+                <p id="userVence" style="color: #888; margin-top:5px; font-size: 0.9em;">Cargando...</p>
+            </div>
+
+            <div class="card" style="border: 1px solid var(--verde);">
+                <p style="margin:0 0 10px 0; font-size: 0.7em; color: var(--verde); font-weight: bold;">RENOVACIÓN RÁPIDA</p>
+                <div class="payment-grid">
+                    <button class="btn-pay btn-ath" onclick="doATH()">
+                        <img src="https://static.wixstatic.com/media/26f95d_1033b006734c4493a7433292415d481e~mv2.png" class="logo-small"> ATH
+                    </button>
+                    <button class="btn-pay btn-paypal" onclick="doPP()">
+                        <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" class="logo-small"> PayPal
+                    </button>
+                </div>
+            </div>
+
+            <div class="card" style="height: 180px;"><canvas id="chartProgreso"></canvas></div>
+            <button onclick="addPeso()" style="width:100%; padding:18px; background:var(--verde); border:none; border-radius:15px; font-weight:bold; color: black;">⚖️ REGISTRAR PESO ACTUAL</button>
+        </div>
+
+        <div id="view-ajustes" class="view">
+            <div class="card">
+                <h3>Ajustes de Cobro</h3>
+                <label>Tu pATH</label><input type="text" id="in_ath" placeholder="/Nombre">
+                <label>Link PayPal</label><input type="text" id="in_pp" placeholder="paypal.me/usuario">
+                <button onclick="saveAdj()" style="width:100%; padding:15px; background:var(--violeta); border:none; border-radius:10px; color:white; font-weight:bold;">GUARDAR AJUSTES</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let db = JSON.parse(localStorage.getItem('qt_db')) || {
+            u: "Nuevo Cliente", l: [], f: {}, vencimiento: ""
+        };
+
+        function toggleAcc(btn) {
+            btn.classList.toggle("active");
+            var panel = btn.nextElementSibling;
+            panel.style.display = (panel.style.display === "block") ? "none" : "block";
+            btn.querySelector('span').innerText = (panel.style.display === "block") ? "-" : "+";
+        }
+
+        function openMenu() { document.getElementById('sideMenu').classList.add('open'); document.getElementById('overlay').style.display = 'block'; }
+        function closeMenu() { document.getElementById('sideMenu').classList.remove('open'); document.getElementById('overlay').style.display = 'none'; }
+
+        function changePage(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            closeMenu();
+        }
+
+        window.onload = function() {
+            if(!db.vencimiento) {
+                let v = new Date(); v.setDate(v.getDate() + 30);
+                db.vencimiento = v.toISOString();
+                save();
+            }
+            loadData();
+            initChart();
+        }
+
+        function loadData() {
+            document.getElementById('displayNombre').innerText = db.u;
+            document.getElementById('userVence').innerText = "Vence: " + new Date(db.vencimiento).toLocaleDateString();
+            
+            const fields = ['in_name','in_edad','in_tel','in_emer','in_peso_i','in_est','in_grasa','in_cint','in_padece','in_cond_det','in_les','in_act','in_sue','in_ale','in_sup','in_obj','in_rm','in_ath','in_pp'];
+            fields.forEach(f => {
+                const key = f.replace('in_', '');
+                if(db.f[key]) document.getElementById(f).value = db.f[key];
+            });
+            if(db.u && db.u !== "Nuevo Cliente") document.getElementById('in_name').value = db.u;
+        }
+
+        function saveExpedienteCompleto() {
+            const fields = ['in_name','in_edad','in_tel','in_emer','in_peso_i','in_est','in_grasa','in_cint','in_padece','in_cond_det','in_les','in_act','in_sue','in_ale','in_sup','in_obj','in_rm'];
+            fields.forEach(f => {
+                const key = f.replace('in_', '');
+                db.f[key] = document.getElementById(f).value;
+            });
+            db.u = document.getElementById('in_name').value || "Cliente";
+            document.getElementById('displayNombre').innerText = db.u;
+            save();
+
+            const msg = document.getElementById('msgSave');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
+            window.scrollTo(0, 0);
+        }
+
+        function saveAdj() {
+            db.f.ath = document.getElementById('in_ath').value;
+            db.f.pp = document.getElementById('in_pp').value;
+            save(); alert("Ajustes de cobro actualizados.");
+        }
+
+        function save() { localStorage.setItem('qt_db', JSON.stringify(db)); }
+
+        function addPeso() {
+            let p = prompt("Peso actual (lbs):");
+            if(p) { db.l.push({d: new Date().toLocaleDateString(), p: parseFloat(p)}); save(); location.reload(); }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('chartProgreso').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: db.l.map(x => x.d),
+                    datasets: [{ data: db.l.map(x => x.p), borderColor: '#2ecc71', tension: 0.3, fill: false }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function doATH() { if(!db.f.ath) return alert("Configura pATH en Ajustes"); window.location.href = "athmovil://"; }
+        function doPP() { if(!db.f.pp) return alert("Configura PayPal en Ajustes"); window.open(db.f.pp.includes('http') ? db.f.pp : 'https://' + db.f.pp, '_blank'); }
+    </script>
+</body>
+</html>
