@@ -14,6 +14,22 @@
             overflow-x: hidden; width: 100%;
         }
 
+        /* PROTECTOR DE PANTALLA (LOGO) */
+        #screensaver {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 20000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .logo-qt {
+            width: 130px; height: 130px; border: 4px solid var(--verde);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 45px; font-weight: 900; color: var(--verde);
+            box-shadow: 0 0 30px rgba(46, 204, 113, 0.3);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.7; } }
+
         .header {
             background: #111; padding: 15px; display: flex; align-items: center;
             border-bottom: 2px solid #222; position: sticky; top: 0; z-index: 999;
@@ -74,7 +90,13 @@
         .logo-small { height: 16px; background: white; padding: 2px; border-radius: 3px; }
     </style>
 </head>
-<body>
+<body onmousedown="resetTimer()" onkeydown="resetTimer()" ontouchstart="resetTimer()">
+
+    <div id="screensaver" onclick="despertar()">
+        <div class="logo-qt">QT</div>
+        <h2 style="margin-top: 20px; letter-spacing: 5px; font-size: 18px;">QUALITY TRAINING</h2>
+        <p style="color: #444; font-size: 10px; margin-top: 10px;">TOCA PARA VOLVER</p>
+    </div>
 
     <div class="header">
         <button class="menu-trigger" onclick="openMenu()">☰</button>
@@ -198,6 +220,22 @@
         let db = JSON.parse(localStorage.getItem('qt_db')) || {
             u: "Nuevo Cliente", l: [], f: {}, vencimiento: ""
         };
+        let timerInactividad;
+
+        // SISTEMA DE LOGO POR INACTIVIDAD (1 MINUTO)
+        function resetTimer() {
+            clearTimeout(timerInactividad);
+            timerInactividad = setTimeout(mostrarLogo, 60000); 
+        }
+
+        function mostrarLogo() {
+            document.getElementById('screensaver').style.display = 'flex';
+        }
+
+        function despertar() {
+            document.getElementById('screensaver').style.display = 'none';
+            resetTimer();
+        }
 
         function toggleAcc(btn) {
             btn.classList.toggle("active");
@@ -223,6 +261,7 @@
             }
             loadData();
             initChart();
+            resetTimer(); // Iniciar contador al cargar
         }
 
         function loadData() {
